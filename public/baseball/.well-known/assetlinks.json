@@ -1,0 +1,12 @@
+[
+	{
+		"relation": ["delegate_permission/common.handle_all_urls"],
+		"target": {
+			"namespace": "android_app",
+			"package_name": "com.zengm.baseball.twa",
+			"sha256_cert_fingerprints": [
+				"E0:FA:41:3C:01:A1:98:70:6D:F6:CC:65:02:91:CD:E3:50:58:A8:25:A6:AE:90:8B:48:EF:C7:0E:7C:07:4C:4D"
+			]
+		}
+	}
+]
