@@ -148,11 +148,17 @@ const Negotiation = ({
 									)}
 								>
 									<div className="flex-grow-1">
-										{contract.amount.map((amount, i) => (
-											<div key={i}>
-												Year {i + 1}: {helpers.formatCurrency(amount, "M")}
+										{Array.isArray(contract.amount) ? (
+											contract.amount.map((amount, i) => (
+												<div key={i}>
+													Year {i + 1}: {helpers.formatCurrency(amount, "M")}
+												</div>
+											))
+										) : (
+											<div>
+												Year 1: {helpers.formatCurrency(contract.amount, "M")}
 											</div>
-										))}
+										)}
 										<span className="d-none d-sm-inline">
 											, through {contract.exp}
 										</span>
@@ -164,7 +170,11 @@ const Negotiation = ({
 										<button
 											className="btn btn-success flex-grow-1"
 											onClick={() =>
-												sign(player.pid, contract.amount[0], contract.exp)
+												sign(
+													player.pid,
+													contract.amount as number,
+													contract.exp,
+												)
 											}
 										>
 											Sign
