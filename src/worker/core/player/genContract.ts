@@ -7,18 +7,11 @@ import type {
 } from "../../../common/types";
 import { isSport } from "../../../common";
 
-/**
- * Generate a contract for a player.
- *
- * @memberOf core.player
- * @param {Object} ratings Player object. At a minimum, this must have one entry in the ratings array.
- * @param {boolean} randomizeExp If true, then it is assumed that some random amount of years has elapsed since the contract was signed, thus decreasing the expiration date. This is used when generating players in a new league.
- * @return {Object.<string, number>} Object containing two properties with integer values, "amount" with the contract amount in thousands of dollars and "exp" with the contract expiration year.
- */
 const genContract = (
 	p: Player<MinimalPlayerRatings> | PlayerWithoutKey<MinimalPlayerRatings>,
 	randomizeAmount: boolean = true,
 	noLimit: boolean = false,
+	distribution: "Frontload" | "Balance" | "Backload" = "Balance",
 ): PlayerContract => {
 	const ratings = p.ratings.at(-1)!;
 	let factor = g.get("salaryCapType") === "hard" ? 1.6 : 2;
@@ -67,8 +60,24 @@ const genContract = (
 
 	amount = helpers.roundContract(amount);
 
+	const contractAmounts: number[] = [];
+	const adjustment = 0.05; // 5% adjustment
+	const years = 4; // Define the number of years in the contract
+
+	for (let i = 0; i < years; i++) {
+		let adjustedAmount = amount;
+		if (distribution === "Frontload") {
+			adjustedAmount *= 1 - adjustment * (years - i - 1);
+		} else if (distribution === "Backload") {
+			adjustedAmount *= 1 + adjustment * i;
+		}
+		contractAmounts.push(adjustedAmount);
+	}
+
+	console.log("genContract amount", amount);
+
 	return {
-		amount,
+		amount: [1, 2, 3, 4],
 		exp: g.get("season"),
 	};
 };

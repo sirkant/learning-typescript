@@ -10,6 +10,7 @@ import {
 import type { View } from "../../common/types";
 import { Mood, RatingsStatsPopover } from "../components";
 import { isSport } from "../../common";
+import { ContractInfo } from "../../common/types";
 
 // Show the negotiations list if there are more ongoing negotiations
 const redirectNegotiationOrRoster = async (cancelled: boolean) => {
@@ -45,6 +46,10 @@ const sign = async (pid: number, amount: number, exp: number) => {
 	redirectNegotiationOrRoster(false);
 };
 
+type Props = View<"negotiation"> & {
+	contractOptions: ContractInfo[];
+};
+
 const Negotiation = ({
 	challengeNoRatings,
 	contractOptions,
@@ -53,7 +58,7 @@ const Negotiation = ({
 	resigning,
 	salaryCap,
 	salaryCapType,
-}: View<"negotiation">) => {
+}: Props) => {
 	useTitleBar({ title: `Contract Negotiation - ${player.name}` });
 
 	const { gender } = useLocalPartial(["gender"]);
@@ -91,7 +96,7 @@ const Negotiation = ({
 
 		message = (
 			<p>
-				You are not allowed to go over the salary cap to make this deal (unless
+				You are not allowed to go over the salary cap to make any deal (unless
 				it is for a minimum contract){extra}.
 			</p>
 		);
@@ -143,23 +148,35 @@ const Negotiation = ({
 									)}
 								>
 									<div className="flex-grow-1">
-										{helpers.formatCurrency(contract.amount, "M")} per year
+										{contract.amount.map((amount, i) => (
+											<div key={i}>
+												Year {i + 1}: {helpers.formatCurrency(amount, "M")}
+											</div>
+										))}
 										<span className="d-none d-sm-inline">
 											, through {contract.exp}
-										</span>{" "}
-										({contract.years}{" "}
-										{contract.years === 1 ? "season" : "seasons"})
+										</span>
+										({contract.years}
+										{contract.years === 1 ? " season" : " seasons"})
 									</div>
 
-									<button
-										className="btn btn-success"
-										onClick={() =>
-											sign(player.pid, contract.amount, contract.exp)
-										}
-									>
-										Sign
-										<span className="d-none d-sm-inline"> Contract</span>
-									</button>
+									<div className="d-flex">
+										<button
+											className="btn btn-success flex-grow-1"
+											onClick={() =>
+												sign(player.pid, contract.amount[0], contract.exp)
+											}
+										>
+											Sign
+											<span className="d-none d-sm-inline"> Contract</span>
+										</button>
+
+										<div className="btn-group ms-2">
+											<button className="btn btn-success">Front 5%</button>
+											<button className="btn btn-success">0%</button>
+											<button className="btn btn-success">Back 5%</button>
+										</div>
+									</div>
 								</div>
 							);
 						})}
@@ -171,7 +188,7 @@ const Negotiation = ({
 				className="btn btn-danger mt-3"
 				onClick={() => cancel(player.pid)}
 			>
-				Can't reach a deal? End negotiation
+				Can't agree? End negotiation
 			</button>
 		</>
 	);
